@@ -4,6 +4,7 @@
   "description": "listen youtube playlists as radio",
   "main": "index.coffee",
   "scripts": {
+    "app": "./node_modules/coffee-script/bin/coffee ./index.coffee",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,6 +27,7 @@
     "coffee-script": "^1.8.0",
     "express": "^4.10.2",
     "jsdom": "^1.2.1",
+    "serve-static": "^1.7.1",
     "stream-transcoder": "0.0.5",
     "underscore": "^1.7.0",
     "ytdl-core": "^0.2.4"

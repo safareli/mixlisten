@@ -65,7 +65,7 @@ app.get '/api', (req, res)->
         next: fileFromVandList(nextV, list)
       )
 
-server = app.listen process.env.PORT, process.env.IP, ->
+server = app.listen 3000, process.env.IP, ->
   host = server.address().address
   port = server.address().port
   console.log('Example app listening at http://%s:%s', host, port)

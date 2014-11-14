@@ -1,0 +1,16 @@
+.radio{
+
+}
+.radio >*{
+  display: none;
+}
+
+.radio[data-state="starting"] .starting{
+  display: block;
+}
+.radio[data-state="loading"] .loading{
+  display: block;
+}
+.radio[data-state="playing"] .playing{
+  display: block;
+}

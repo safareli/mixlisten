@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>mixListen</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+</head>
+<body>
+  <section class="radio" data-state="starting">
+    <audio></audio>
+    <div class="starting">
+      <input class="starting-url" type="url">
+      <button class="starting-start">start</button>
+    </div>
+    <div class="loading">
+      <p>loading...</p>
+    </div>
+    <div class="playing">
+      <a class="playing-url"href="#">its URL</a>
+      <button class="playing-play">togglePlay</button>
+      <button class="playing-next">next</button>
+    </div>    
+  </section>
+  <script src="script.js"></script>
+</body>
+</html>
