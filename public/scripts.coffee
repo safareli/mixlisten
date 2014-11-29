@@ -30,35 +30,41 @@ $startingState = $states.filter('[name="starting"]')
 $startBtn = $startingState.find('.start')
 $inputUrl = $startingState.find('.starting-url')
 
-urlkeyups = Rx.Observable.fromEvent(
-  $inputUrl,
-  'keyup')
-
-validUrlKeyups = urlkeyups.filter(
-  callArgs(
-    isValidPlaylistUrl
-    _.bind(
-      $inputUrl.val
-      $inputUrl)))
-
-invalidUrlKeyups = urlkeyups.filter(
-  _.negate(
+validUrls = Rx.Observable
+  .fromEvent(
+    $inputUrl
+    'keyup')
+  .map(
     callArgs(
       isValidPlaylistUrl
       _.bind(
         $inputUrl.val
-        $inputUrl))))
+        $inputUrl)))
 
-validUrlKeyups.subscribe(
-  blockBind(
-    $startBtn.removeAttr,
-    $startBtn,
-    'disabled'))
+#invalid
+validUrls
+  .filter(
+    _.negate(Boolean))
+  .subscribe(
+    blockBind(
+      $startBtn.attr
+      $startBtn
+      "disabled"
+      true))
 
-invalidUrlKeyups.subscribe(
-  blockBind(
-    $startBtn.attr,
-    $startBtn,
-    "disabled",
-    true))
+#valid
+validUrls
+  .filter(Boolean)
+  .subscribe(
+    blockBind(
+      $startBtn.removeAttr
+      $startBtn
+      'disabled'))
 
+
+validUrls
+  .subscribe(
+    _.bind(
+      console.log
+      console
+      'validUrls ='))
