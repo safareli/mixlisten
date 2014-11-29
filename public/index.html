@@ -8,21 +8,27 @@
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 </head>
 <body>
-  <section class="radio" data-state="starting">
-    <audio></audio>
-    <div class="starting">
-      <input class="starting-url" type="url">
-      <button class="starting-start">start</button>
-    </div>
-    <div class="loading">
-      <p>loading...</p>
-    </div>
-    <div class="playing">
-      <a class="playing-url"href="#">its URL</a>
-      <button class="playing-play">togglePlay</button>
-      <button class="playing-next">next</button>
-    </div>    
-  </section>
+  <player>
+    <state default name="starting">
+      <input type="url" class="starting-url">
+      <button for-state="started">start</button>
+    </state>
+    <state name="started">
+      <state default name="loading">
+        <p>loading...</p>
+      </state>
+      <state name="loaded">
+        <a href="#">its URL</a>
+        <state name="paused">
+          <button>Play</button>
+        </state>
+        <state default name="playing">
+          <button>pause</button>
+        </state>
+        <button for-state="started.loading">next</button>
+      </state>
+    </state>    
+  </player>
   <script src="script.js"></script>
 </body>
 </html>

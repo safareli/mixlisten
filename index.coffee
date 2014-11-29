@@ -2,6 +2,7 @@ _ = require 'underscore'
 ytdl    = require 'ytdl-core'
 Transcoder = require 'stream-transcoder'
 express = require 'express'
+coffeeMiddleware = require('coffee-middleware')
 jsdom = require 'jsdom'
 serveStatic = require 'serve-static'
 app = express()
@@ -37,7 +38,9 @@ nextVideoV = (next)->
   next.getAttribute('data-video-id')
 
 
-app.use(serveStatic('public'))
+app.use serveStatic(__dirname + '/public')
+app.use coffeeMiddleware
+  src: __dirname + '/public'
 
 app.get '/listen', (req, res)->
   v = req.query.v
