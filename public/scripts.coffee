@@ -1,112 +1,64 @@
-#setup all states (initial) and get state machine
-loadURL = (url) ->
-  $radio.attr "data-state", "loading"
-  $.getJSON(url).then (res) ->
-    nextURL = res.next.self
-    $itsURL.attr "href", res.original
-    audioElement.setAttribute "src", res.audio
-    return
+$player = $('player')
+$states = $player.find('state')
 
-  return
+# init
+$states.each ()->
+  $(this).hide()
+.filter ()->
+  $(this).is('[default]')
+.show()
 
-(($player) ->
-  mechine = stateMachineFromStates($player.find("state"))
-  log = (first)->
-    console.log(arguments)
-    return first
+_.mixin
+  call: (f)->
+    f()
+  callNext : (f)->
+    (args...) ->
+      ()->
+        f.apply(undefined,args)
 
-  player.once 'setup' ()->
-    machine.setState('starting')
+callArgs = _.callNext (f, argProviders...) ->
+  f.apply(undefined, argProviders.map(_.call))
 
-    @audio = document.createElement("audio")
-    @audio.setAttribute "autoplay", "autoplay"
-    @audio.addEventListener "loadstart", ()=>
-      machine.setState('loading')
+blockBind = _.callNext (f, c, args...) ->
+  f.apply(c, args)
 
-    @audio.addEventListener "loadeddata", ()=>
-      machine.setState('loaded')
+isValidPlaylistUrl = (url) ->
+  RegExp = /^https?:\/\/(?:www\.)?youtube.com\/watch\?(?=.*v=\w+)(?=.*list=\w+)(?:\S+)?$/
+  RegExp.test(url)
 
-  mechine.on
-    starting:
-      init:(el)->
-        @urlInput = $(el).find('.starting-url')
-        @startBtn = $(el).find('[for-state]')
-        @startBtn.on 'click', ()=>
-          @setState('started',@urlInput.val())
+$startingState = $states.filter('[name="starting"]')
+$startBtn = $startingState.find('.start')
+$inputUrl = $startingState.find('.starting-url')
 
-      in:()->
-        @urlInput.val('')
+urlkeyups = Rx.Observable.fromEvent(
+  $inputUrl,
+  'keyup')
 
-    started:
-      in:(url)->
-        @setState('loading')
-        $.getJSON(url).then (res) =>
-          @nextURL = res.next.self
-          @setState('loaded',res)
-          
+validUrlKeyups = urlkeyups.filter(
+  callArgs(
+    isValidPlaylistUrl
+    _.bind(
+      $inputUrl.val
+      $inputUrl)))
 
-          $itsURL.attr "href", res.original
-          audioElement.setAttribute "src", res.audio
-          return
-        @audio.src = url
-        # is aut play set so no need to play
-        # @audio.play()
-        
-      out:()->
-        @audio.removeAttribute('src')
+invalidUrlKeyups = urlkeyups.filter(
+  _.negate(
+    callArgs(
+      isValidPlaylistUrl
+      _.bind(
+        $inputUrl.val
+        $inputUrl))))
 
-      loading:
-        in:(objToLoad)->
+validUrlKeyups.subscribe(
+  blockBind(
+    $startBtn.removeAttr,
+    $startBtn,
+    'disabled'))
 
-        out:()->
+invalidUrlKeyups.subscribe(
+  blockBind(
+    $startBtn.attr,
+    $startBtn,
+    "disabled",
+    true))
 
-      loaded:
-        in:()->
-
-        out:()->
-
-        paused:
-          in:()->
-
-          out:()->
-
-        playing:
-          in:()->
-
-          out:()->
-
-  
-  states.filter("[initial]").show()
-  audioElement = document.createElement("audio")
-  audioElement.setAttribute "autoplay", "autoplay"
-  audioElement.addEventListener "playing", (->
-    $radio.attr "data-state", "playing"
-    audioElement.play()
-    return
-  ), true
-  return
-) $("player")
-nextURL = null
-$itsURL = $radio.find(".playing-url")
-audioElement.addEventListener "ended", (->
-  $radio.attr "data-state", "loading"
-  loadURL nextURL
-  return
-), true
-$radio.find(".playing-play").on "click", ->
-  if audioElement.paused
-    audioElement.play()
-  else
-    audioElement.pause()
-  return
-
-$radio.find(".playing-next").on "click", ->
-  audioElement.pause()
-  loadURL nextURL
-  return
-
-$radio.find(".starting-start").on "click", ->
-  url = $radio.find(".starting-url").val()
-  sufix = url.split("watch")[1]
-  loadURL "/api" + sufix
-  return

@@ -40,6 +40,7 @@ nextVideoV = (next)->
 
 app.use serveStatic(__dirname + '/public')
 app.use coffeeMiddleware
+  encodeSrc: false
   src: __dirname + '/public'
 
 app.get '/listen', (req, res)->

@@ -6,12 +6,14 @@
   <title>mixListen</title>
   <link rel="stylesheet" href="style.css">
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdn.rawgit.com/Reactive-Extensions/RxJS/master/dist/rx.all.min.js"></script>
+  <script src="//cdn.rawgit.com/jashkenas/underscore/master/underscore-min.js"></script>
 </head>
 <body>
   <player>
     <state default name="starting">
       <input type="url" class="starting-url">
-      <button for-state="started">start</button>
+      <button disabled class="start">start</button>
     </state>
     <state name="started">
       <state default name="loading">
@@ -20,15 +22,15 @@
       <state name="loaded">
         <a href="#">its URL</a>
         <state name="paused">
-          <button>Play</button>
+          <button disabled>Play</button>
         </state>
         <state default name="playing">
-          <button>pause</button>
+          <button disabled>pause</button>
         </state>
-        <button for-state="started.loading">next</button>
+        <button disabled>next</button>
       </state>
     </state>    
   </player>
-  <script src="script.js"></script>
+  <script src="scripts.js"></script>
 </body>
 </html>
