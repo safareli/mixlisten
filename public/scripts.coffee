@@ -19,7 +19,7 @@ _.mixin
 callArgs = _.callNext (f, argProviders...) ->
   f.apply(undefined, argProviders.map(_.call))
 
-blockBind = _.callNext (f, c, args...) ->
+unaryBind = _.callNext (f, c, args...) ->
   f.apply(c, args)
 
 isValidPlaylistUrl = (url) ->
@@ -48,7 +48,7 @@ validUrls
   .filter(
     _.negate(Boolean))
   .subscribe(
-    blockBind(
+    unaryBind(
       $startBtn.attr
       $startBtn
       "disabled"
@@ -58,7 +58,7 @@ validUrls
 validUrls
   .filter(Boolean)
   .subscribe(
-    blockBind(
+    unaryBind(
       $startBtn.removeAttr
       $startBtn
       'disabled'))
@@ -79,42 +79,64 @@ setState = (stateName)->
   $states.hide()
   $states.find("[name='#{stateName}']").parents('state').andSelf().show()
 
-nextURL = null
-audioElement = document.createElement('audio')
-audioElement.setAttribute('autoplay', 'autoplay')
-audioElement.addEventListener "playing", ()->
-  setState('playing')
-  audioElement.play()
-
-
-
-audioElement.addEventListener "ended", ->
-  setState('loading')
-  loadURL(nextURL)
+stater = (stateName, f)->
+  (args...)->
+    setState(stateName)
+    f.apply()
 
 $playingUrl = $player.find('.playing-url')
 
-loadURL = (url) ->
-  setState('loading')
-  $.getJSON(url).then (res) ->
-    nextURL = res.next.self
-    $playingUrl.attr('href',res.original)
-    audioElement.setAttribute "src", res.audio
-    return
+just = (wat)->
+  (it)->
+    wat = it if typeof it isnt 'undefined'
+    wat
+
+decorate = (beafore,one,after)->
+  ()->
+    beafore() if beafore
+    one.apply(this,arguments)
+    after() if after
+
+nextURL = just(null)
+audioElement = document.createElement('audio')
+audioElement.setAttribute('autoplay', 'autoplay')
+loadURL = decorate _.bind(setState,undefined,'loading'), (url) ->
+    $.getJSON(url).then (res) ->
+      nextURL(res.next.self)
+      $playingUrl.attr('href',res.original)
+      audioElement.setAttribute "src", res.audio
+      return
+loadNext = callArgs(loadURL,nextURL);
+
+audioElement.addEventListener "playing", decorate(
+  _.bind(setState,undefined,'playing')
+  unaryBind(audioElement.play, audioElement))
+audioElement.addEventListener "ended", loadNext
 
 
-$pauseBtn.on 'click', ()->
-  setState('paused')
-  audioElement.pause()
 
-$startBtn.on 'click', ()->
-  loadURL(apiUrl($inputUrl.val()))
+
+
+
+
+
+$pauseBtn.on 'click', decorate(
+  _.bind(setState,undefined,'paused')
+  unaryBind(audioElement.pause, audioElement))
+
+$startBtn.on 'click', callArgs(
+  _.compose(loadURL,apiUrl)
+  unaryBind(
+    $inputUrl.val
+    $inputUrl))
+
+$playBtn.on 'click', decorate(
+  _.bind(setState,undefined,'playing')
+  unaryBind(audioElement.play, audioElement))
+
+$nextBtn.on 'click', decorate(
+  null,
+  unaryBind(audioElement.pause, audioElement)
+  loadNext)
   
-$playBtn.on 'click', ()->
-  setState('playing')
-  audioElement.play()
-
-$nextBtn.on 'click', ()->
-  audioElement.pause()
-  loadURL(nextURL)
   
