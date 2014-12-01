@@ -24,8 +24,7 @@ applayInvokedArguments = (f, argProviders...) ->
 callArgs = callNext(
   applayInvokedArguments)
 
-nullaryBind = callNext (f, c, args...) ->
-  f.apply(c, args)
+nullaryBind = callNext(Function::call.bind(Function::call))
 
 
 isValidPlaylistUrl = (url) ->
