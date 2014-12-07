@@ -10,8 +10,8 @@ $states.hide().filter(R.compose(
 nullary = R.curry(R.nAry)(0)
 callNext = R.curryN(2,R.compose(nullary, R.lPartial))
 
-applyWithInvokingArguments = (f, argProviders...) ->
-  R.apply(f, R.map(R.call, argProviders))
+applyWithInvokingArguments = (f) ->
+  R.apply(f, R.map(R.call, R.tail(arguments)))
 
 callArgs = callNext(applyWithInvokingArguments)
 
