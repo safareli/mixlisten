@@ -2,27 +2,18 @@ $player = $('player')
 $states = $player.find('state')
 
 # init
-$states.each ->
-  $(this).hide()
-.filter ->
-  $(this).is('[default]')
-.show()
+$states.hide().filter(R.compose(
+  R.invokerN(1,'is','[default]')
+  , jQuery
+  , R.nthArg(1))).show()
 
-call = (f)->
-  f()
+nullary = R.curry(R.nAry)(0)
+callNext = R.curryN(2,R.compose(nullary, R.lPartial))
 
-nullary = (f)->
-  _.bind(call, undefined, f)
+applyWithInvokingArguments = (f, argProviders...) ->
+  R.apply(f, R.map(R.call, argProviders))
 
-callNext = (f)->
-  () ->
-    nullary( _.bind(f.apply, f, undefined, arguments))
-
-applayInvokedArguments = (f, argProviders...) ->
-  f.apply(undefined, argProviders.map(call))
-
-callArgs = callNext(
-  applayInvokedArguments)
+callArgs = callNext(applyWithInvokingArguments)
 
 nullaryBind = callNext(Function::call.bind(Function::call))
 
