@@ -70,17 +70,15 @@ validUrls
 apiUrl = (url)->
   'api/' + url.split('watch')[1]
 
-staterFor = ($el)->
-  (stateName)->
-    $el.hide()
-    $el.find("[name='#{stateName}']").parents('state').andSelf().show()
+staterFor = R.curry ($el,stateName)->
+  $el.hide()
+  $el.find("[name='#{stateName}']").parents('state').andSelf().show()
 
 setStateThen = _.compose(callNext, staterFor)($states)
 
-just = (wat)->
-  (it)->
-    wat = it if typeof it isnt 'undefined'
-    wat
+just = R.curry (wat, it)->
+  wat = it if typeof it isnt 'undefined'
+  wat
 
 wrap = (beafore,one,after)->
   ->
