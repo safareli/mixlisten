@@ -19,7 +19,7 @@ nullaryBind = callNext(Function::call.bind(Function::call))
 
 
 isValidPlaylistUrl = (url) ->
-  RegExp = /^https?:\/\/(?:www\.)?youtube.com\/watch\?(?=.*v=\w+)(?=.*list=\w+)(?:\S+)?$/
+  RegExp = /^https?:\/\/(?:www\.)?youtube.com\/watch\?(?=.*v=[\w-]+)(?=.*list=[\w-]+)(?:\S+)?$/
   RegExp.test(url)
 
 $startBtn = $states.find('.start')
