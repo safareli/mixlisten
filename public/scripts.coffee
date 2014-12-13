@@ -76,9 +76,10 @@ staterFor = R.curry ($el,stateName)->
 
 setStateThen = _.compose(callNext, staterFor)($states)
 
-just = R.curry (wat, it)->
-  wat = it if typeof it isnt 'undefined'
-  wat
+just = (wat)->
+  (it)->
+    wat = it if typeof it isnt 'undefined'
+    wat
 
 wrap = (beafore,one,after)->
   ->
